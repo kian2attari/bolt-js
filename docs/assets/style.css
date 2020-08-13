@@ -20,6 +20,18 @@ body {
   grid-area: content;
 }
 
+span.beta {
+  background-color: #E8F5FA;
+  color: #1264A3;
+  padding: 4px 9px;
+  margin-right: 2px;
+  border-radius: 16px;
+  border: 1px solid #D4ECF6;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.7em;
+}
+
 /* Sidebar */
 .panel {
   position: fixed;

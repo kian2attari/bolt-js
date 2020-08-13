@@ -1,5 +1,5 @@
-import { StringIndexed } from '../helpers';
 import { MessageAttachment, KnownBlock, Block, View } from '@slack/types';
+import { StringIndexed } from '../helpers';
 
 /**
  * All known event types in Slack's Events API
@@ -443,7 +443,7 @@ export interface InviteRequestedEvent extends StringIndexed {
       id: string;
       name: string;
       domain: string;
-    }
+    };
   };
 }
 
@@ -564,7 +564,8 @@ export interface MessageRepliedEvent extends StringIndexed {
   channel: string;
   event_ts: string;
   ts: string;
-  message: MessageEvent & { // TODO: should this be the union of all message events with type 'message'?
+  message: MessageEvent & {
+    // TODO: should this be the union of all message events with type 'message'?
     thread_ts: string;
     reply_count: number;
     replies: MessageEvent[]; // TODO: should this be the union of all message events with type 'message'?
@@ -581,7 +582,8 @@ export interface ThreadBroadcastMessageEvent extends StringIndexed {
     thread_ts: string;
     user: string;
     ts: string;
-    root:  MessageEvent & { // TODO: should this be the union of all message events with type 'message'?
+    root: MessageEvent & {
+      // TODO: should this be the union of all message events with type 'message'?
       thread_ts: string;
       reply_count: number;
       replies: MessageEvent[]; // TODO: should this be the union of all message events with type 'message'?
@@ -596,8 +598,7 @@ export interface PinAddedEvent extends StringIndexed {
   user: string;
   channel_id: string;
   // TODO: incomplete, should be message | file | file comment (deprecated)
-  item: {
-  };
+  item: {};
 }
 
 export interface PinRemovedEvent extends StringIndexed {
@@ -605,10 +606,28 @@ export interface PinRemovedEvent extends StringIndexed {
   user: string;
   channel_id: string;
   // TODO: incomplete, should be message | file | file comment (deprecated)
-  item: {
-  };
+  item: {};
   has_pins: boolean;
   event_ts: string;
+}
+
+interface ReactionMessageItem {
+  type: 'message';
+  channel: string;
+  ts: string;
+}
+
+interface ReactionFileItem {
+  type: 'file';
+  file: string;
+}
+
+// This type is deprecated.
+// See https://api.slack.com/changelog/2018-05-file-threads-soon-tread
+interface ReactionFileCommentItem {
+  type: 'file_comment';
+  file_comment: string;
+  file: string;
 }
 
 export interface ReactionAddedEvent extends StringIndexed {
@@ -616,10 +635,7 @@ export interface ReactionAddedEvent extends StringIndexed {
   user: string;
   reaction: string;
   item_user: string;
-  // TODO: incomplete, should be message | file | file comment (deprecated)
-  // https://api.slack.com/events/reaction_added
-  item: {
-  };
+  item: ReactionMessageItem | ReactionFileItem | ReactionFileCommentItem;
   event_ts: string;
 }
 
@@ -630,8 +646,7 @@ export interface ReactionRemovedEvent extends StringIndexed {
   item_user: string;
   // TODO: incomplete, should be message | file | file comment (deprecated)
   // https://api.slack.com/events/reaction_removed
-  item: {
-  };
+  item: {};
   event_ts: string;
 }
 
@@ -643,8 +658,7 @@ export interface StarAddedEvent extends StringIndexed {
   user: string;
   // TODO: incomplete, items are of type message | file | file comment (deprecated) | channel | im | group
   // https://api.slack.com/events/star_added, https://api.slack.com/methods/stars.list
-  item: {
-  };
+  item: {};
   event_ts: string;
 }
 
@@ -653,8 +667,7 @@ export interface StarRemovedEvent extends StringIndexed {
   user: string;
   // TODO: incomplete, items are of type message | file | file comment (deprecated) | channel | im | group
   // https://api.slack.com/events/star_removed, https://api.slack.com/methods/stars.list
-  item: {
-  };
+  item: {};
   event_ts: string;
 }
 
@@ -708,8 +721,7 @@ export interface TeamJoinEvent extends StringIndexed {
   type: 'team_join';
   // TODO: incomplete, this should probably be a reference to a User shape from @slack/types.
   // https://api.slack.com/types/user
-  user: {
-  };
+  user: {};
 }
 
 export interface TeamRenameEvent extends StringIndexed {
@@ -732,8 +744,7 @@ export interface UserChangeEvent extends StringIndexed {
   type: 'user_change';
   // TODO: incomplete, this should probably be a reference to a User shape from @slack/types.
   // https://api.slack.com/types/user
-  user: {
-  };
+  user: {};
 }
 
 // NOTE: `user_resourced_denied`, `user_resource_granted`, `user_resourced_removed` are left out because they are

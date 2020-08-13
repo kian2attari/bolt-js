@@ -10,7 +10,7 @@ Slack apps installed on multiple workspaces will need to implement OAuth, then s
 
 Bolt for JavaScript will create a **Redirect URL** `slack/oauth_redirect`, which Slack uses to redirect users after they complete your app's installation flow. You will need to add this **Redirect URL** in your app configuration settings under **OAuth and Permissions**. This path can be configured in the `installerOptions` argument described below.
 
-Bolt for JavaScript will also create a `slack/install` route, where you can find an `Add to Slack` button for your app to perform direct installs of your app. If you need any additional authorizations (user tokens) from users inside a team when your app is already installed or a reason to dynamically generate an install URL, you can generate it via `app.installer.generateInstallUrl()`. Read more about `generateInstallUrl()` in the [OAuth docs](https://slack.dev/node-slack-sdk/oauth#generating-an-installation-url). 
+Bolt for JavaScript will also create a `slack/install` route, where you can find an `Add to Slack` button for your app to perform direct installs of your app. If you need any additional authorizations (user tokens) from users inside a team when your app is already installed or a reason to dynamically generate an install URL, manually instantiate an `ExpressReceiver`, assign the instance to a variable named `receiver`, and then call `receiver.installer.generateInstallUrl()`. Read more about `generateInstallUrl()` in the [OAuth docs](https://slack.dev/node-slack-sdk/oauth#generating-an-installation-url).
 
 To learn more about the OAuth installation flow with Slack, [read the API documentation](https://api.slack.com/authentication/oauth-v2).
 </div>
@@ -23,13 +23,13 @@ const app = new App({
   stateSecret: 'my-state-secret',
   scopes: ['channels:read', 'groups:read', 'channels:manage', 'chat:write', 'incoming-webhook'],
   installationStore: {
-    storeInstallation: (installation) => {
+    storeInstallation: async (installation) => {
       // change the line below so it saves to your database
-      return database.set(installation.team.id, installation);
+      return await database.set(installation.team.id, installation);
     },
-    fetchInstallation: (InstallQuery) => {
+    fetchInstallation: async (InstallQuery) => {
       // change the line below so it fetches from your database
-      return database.get(InstallQuery.teamId);
+      return await database.get(InstallQuery.teamId);
     },
   },
 });
@@ -48,7 +48,7 @@ You can override the default OAuth using the `installerOptions` object, which ca
 - `installPath`: Override default path for "Add to Slack" button
 - `redirectUriPath`: Override default redirect url path
 - `callbackOptions`: Provide custom success and failure pages at the end of the OAuth flow
-- `stateStore`: Provide a custom state store instead of using the built in `ClearStatStore`
+- `stateStore`: Provide a custom state store instead of using the built in `ClearStateStore`
 
 </div>
 
@@ -78,19 +78,19 @@ const app = new App({
         // generateStateParam's first argument is the entire InstallUrlOptions object which was passed into generateInstallUrl method
         // the second argument is a date object
         // the method is expected to return a string representing the state
-        generateStateParam: (installUrlOptions, date) => {
+        generateStateParam: async (installUrlOptions, date) => {
           // generate a random string to use as state in the URL
           const randomState = randomStringGenerator();
           // save installOptions to cache/db
-          myDB.set(randomState, installUrlOptions);
+          await myDB.set(randomState, installUrlOptions);
           // return a state string that references saved options in DB
           return randomState;
         },
         // verifyStateParam's first argument is a date object and the second argument is a string representing the state
         // verifyStateParam is expected to return an object representing installUrlOptions
-        verifyStateParam:  (date, state) => {
+        verifyStateParam:  async (date, state) => {
           // fetch saved installOptions from DB using state reference
-          const installUrlOptions = myDB.get(randomState);
+          const installUrlOptions = await myDB.get(randomState);
           return installUrlOptions;
         }
       },
